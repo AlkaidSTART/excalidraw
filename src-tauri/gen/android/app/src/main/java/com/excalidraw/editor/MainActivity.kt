@@ -1,4 +1,4 @@
-package com.excalidraw.app
+package com.excalidraw.editor
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
