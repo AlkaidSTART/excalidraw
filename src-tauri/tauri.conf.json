@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Excalidraw",
+  "version": "0.1.0",
+  "identifier": "com.excalidraw.app",
+  "build": {
+    "beforeDevCommand": "yarn start",
+    "devUrl": "http://localhost:3000",
+    "beforeBuildCommand": "yarn build:app",
+    "frontendDist": "../excalidraw-app/build"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Excalidraw",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 480,
+        "minHeight": 360,
+        "resizable": true,
+        "fullscreen": false,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "app"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "Productivity",
+    "shortDescription": "Virtual hand-drawn style whiteboard",
+    "longDescription": "Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them.",
+    "macOS": {
+      "minimumSystemVersion": "10.13"
+    }
+  }
+}
