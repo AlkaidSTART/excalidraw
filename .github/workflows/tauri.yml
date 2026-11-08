@@ -152,6 +152,29 @@ jobs:
           storeFile=$RUNNER_TEMP/keystore.jks
           EOF
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('src-tauri/gen/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Pre-download Gradle distribution
+        working-directory: src-tauri/gen/android
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if ./gradlew --version; then
+              exit 0
+            fi
+            echo "::warning::Gradle distribution download failed (attempt $attempt), retrying..."
+            sleep 10
+          done
+          echo "::error::Unable to download the Gradle distribution after 5 attempts"
+          exit 1
+
       - name: Build APK
         run: |
           export NDK_HOME="$ANDROID_HOME/ndk/27.1.12297006"
