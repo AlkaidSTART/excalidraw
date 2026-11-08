@@ -45,10 +45,34 @@ export const toUint8Array = (value: unknown): Uint8Array => {
   }
 
   if (typeof value === "string") {
-    return Uint8Array.from(atob(value), (char) => char.charCodeAt(0));
+    try {
+      return Uint8Array.from(atob(value), (char) => char.charCodeAt(0));
+    } catch {
+      // Older plugin versions may return BLOBs as a JSON array string.
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          return new Uint8Array(parsed);
+        }
+      } catch {
+        // fall through
+      }
+      return new TextEncoder().encode(value);
+    }
   }
 
   return new Uint8Array();
+};
+
+export const bytesToBase64 = (bytes: Uint8Array) => {
+  const chunkSize = 0x8000;
+  let binary = "";
+
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
+  }
+
+  return btoa(binary);
 };
 
 export const dataUrlToBytes = (
@@ -81,13 +105,5 @@ export const dataUrlToBytes = (
   return { bytes, mimeType };
 };
 
-export const bytesToDataUrl = (bytes: Uint8Array, mimeType: string) => {
-  const chunkSize = 0x8000;
-  let binary = "";
-
-  for (let index = 0; index < bytes.length; index += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
-  }
-
-  return `data:${mimeType};base64,${btoa(binary)}`;
-};
+export const bytesToDataUrl = (bytes: Uint8Array, mimeType: string) =>
+  `data:${mimeType};base64,${bytesToBase64(bytes)}`;

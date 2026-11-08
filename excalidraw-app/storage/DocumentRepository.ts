@@ -8,7 +8,12 @@ import type {
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
 
-import { bytesToDataUrl, dataUrlToBytes, toUint8Array } from "./db";
+import {
+  bytesToBase64,
+  bytesToDataUrl,
+  dataUrlToBytes,
+  toUint8Array,
+} from "./db";
 
 import type Database from "@tauri-apps/plugin-sql";
 
@@ -237,6 +242,9 @@ export class DocumentRepository implements DocumentStore {
           const { bytes, mimeType } = dataUrlToBytes(file.dataURL);
           const created = file.created ?? Date.now();
           const lastRetrieved = file.lastRetrieved ?? Date.now();
+          // SQLite binds serde_json arrays as TEXT, not BLOB, so store the
+          // base64 payload explicitly and decode it on read.
+          const base64 = bytesToBase64(bytes);
 
           await this.database.execute(
             `INSERT OR REPLACE INTO document_files
@@ -246,7 +254,7 @@ export class DocumentRepository implements DocumentStore {
               id,
               file.id,
               file.mimeType || mimeType,
-              Array.from(bytes),
+              base64,
               created,
               lastRetrieved,
             ],
@@ -334,10 +342,11 @@ export class DocumentRepository implements DocumentStore {
 
   async saveThumbnail(id: string, blob: Blob): Promise<void> {
     const bytes = new Uint8Array(await blob.arrayBuffer());
+    const dataURL = bytesToDataUrl(bytes, "image/png");
     await this.database.execute(
       `INSERT OR REPLACE INTO document_thumbnails (document_id, data, updated_at)
        VALUES ($1, $2, $3)`,
-      [id, Array.from(bytes), Date.now()],
+      [id, dataURL, Date.now()],
     );
   }
 
@@ -349,7 +358,11 @@ export class DocumentRepository implements DocumentStore {
     if (!rows[0]) {
       return null;
     }
-    const bytes = toUint8Array(rows[0].data);
+    const data = rows[0].data;
+    const bytes =
+      typeof data === "string" && data.startsWith("data:")
+        ? dataUrlToBytes(data).bytes
+        : toUint8Array(data);
     return new Blob([bytes as unknown as BlobPart], { type: "image/png" });
   }
 

@@ -4,6 +4,7 @@ import {
   TTDDialog,
   TTDDialogTrigger,
   useExcalidrawAPI,
+  useHandleLibrary,
 } from "@excalidraw/excalidraw";
 import {
   CommandPalette,
@@ -22,6 +23,7 @@ import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { FileStatusStore } from "../data/fileStatusStore";
 import { useDocumentSession } from "../hooks/useDocumentSession";
 import { useAppLangCode } from "../app-language/language-state";
+import { LibrarySqliteAdapter } from "../storage/LibrarySqliteAdapter";
 import { isTauriMobile } from "../tauri";
 import { useHandleAppTheme } from "../useHandleAppTheme";
 
@@ -44,6 +46,11 @@ const ExcalidrawWrapper = ({
     store,
   );
   const [errorMessage, setErrorMessage] = useState("");
+
+  useHandleLibrary({
+    excalidrawAPI,
+    adapter: LibrarySqliteAdapter,
+  });
 
   const handleBack = useCallback(async () => {
     await flush();

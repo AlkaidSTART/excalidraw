@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS document_files (
   document_id    TEXT NOT NULL,
   file_id        TEXT NOT NULL,
   mime_type      TEXT NOT NULL,
-  data           BLOB NOT NULL,
+  data           TEXT NOT NULL,
   created        INTEGER NOT NULL,
   last_retrieved INTEGER,
   PRIMARY KEY (document_id, file_id)
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS document_files (
 
 CREATE TABLE IF NOT EXISTS document_thumbnails (
   document_id TEXT PRIMARY KEY,
-  data        BLOB NOT NULL,
+  data        TEXT NOT NULL,
   updated_at  INTEGER NOT NULL
 );
 
