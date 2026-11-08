@@ -13,7 +13,8 @@ const readPackageVersion = () =>
   ).version as string;
 
 const resolveAppVersion = (envVars: Record<string, string>) => {
-  const override = envVars.VITE_APP_VERSION?.trim();
+  const override =
+    envVars.VITE_APP_VERSION?.trim() || process.env.VITE_APP_VERSION?.trim();
   if (override) {
     return override;
   }
