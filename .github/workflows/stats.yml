@@ -3,13 +3,11 @@ name: Stats
 # Posts every master commit's production build (bundle size) and its page-load
 # measurements — next to the commit before it, both built and measured
 # alternately on the same runner — to the Excalidraw+ admin's Bundle size and
-# Performance pages (scripts/stats/). No run cancels another, so commits merged
-# close together are all measured.
+# Performance pages (scripts/stats/). Run it manually; it is not part of the
+# per-push CI.
 # OSS_STATS_TOKEN lives in the `stats` environment, which only master can use.
 
 on:
-  push:
-    branches: master
   workflow_dispatch:
 
 permissions:
