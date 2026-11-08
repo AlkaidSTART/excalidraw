@@ -7,13 +7,7 @@
   "permissions": [
     {
       "identifier": "fs:scope",
-      "allow": [
-        { "path": "$HOME/**/*" },
-        { "path": "$DESKTOP/**/*" },
-        { "path": "$DOCUMENT/**/*" },
-        { "path": "$DOWNLOAD/**/*" },
-        { "path": "$PICTURE/**/*" }
-      ]
+      "allow": [{ "path": "$HOME/**/*" }, { "path": "$DESKTOP/**/*" }, { "path": "$DOCUMENT/**/*" }, { "path": "$DOWNLOAD/**/*" }, { "path": "$PICTURE/**/*" }]
     }
   ]
 }
