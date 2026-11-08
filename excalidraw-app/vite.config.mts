@@ -1,14 +1,53 @@
+import { execSync } from "child_process";
+import fs from "fs";
 import path from "path";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
 import checker from "vite-plugin-checker";
 
+const readPackageVersion = () =>
+  JSON.parse(
+    fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf-8"),
+  ).version as string;
+
+const resolveAppVersion = (envVars: Record<string, string>) => {
+  const override = envVars.VITE_APP_VERSION?.trim();
+  if (override) {
+    return override;
+  }
+
+  // Tagged CI builds (v1.2.3) must report the release version, otherwise the
+  // update check would keep prompting users who already installed it.
+  const refName = process.env.GITHUB_REF_NAME?.trim();
+  if (refName?.startsWith("v")) {
+    return refName.slice(1);
+  }
+
+  try {
+    const tag = execSync("git describe --tags --exact-match HEAD", {
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim();
+    if (tag.startsWith("v")) {
+      return tag.slice(1);
+    }
+  } catch {
+    // not on a tag — fall back to the package version
+  }
+
+  return readPackageVersion();
+};
+
 export default defineConfig(({ mode }) => {
   const envVars = loadEnv(mode, path.resolve(__dirname, ".."));
 
   return {
     root: __dirname,
+    define: {
+      __APP_VERSION__: JSON.stringify(resolveAppVersion(envVars)),
+    },
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
       open: false,

@@ -4,10 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
+import { UpdateBanner } from "./components/UpdateBanner";
 import { EditorScreen } from "./editor/EditorScreen";
 import { DocumentBrowser } from "./home/DocumentBrowser";
 import { useAndroidBack } from "./hooks/useAndroidBack";
 import { useKeyboardInset } from "./hooks/useKeyboardInset";
+import { useVersionCheck } from "./hooks/useVersionCheck";
 import { listenForOpenFile } from "./tauri";
 
 import type { DocumentStore } from "./storage/types";
@@ -23,6 +25,7 @@ const parseHash = (): Route => {
 
 export const Root = ({ store }: { store: DocumentStore }) => {
   const [route, setRoute] = useState<Route>(parseHash);
+  const { update, clientVersion, dismiss, openUpdate } = useVersionCheck();
 
   useEffect(() => {
     const onHashChange = () => setRoute(parseHash());
@@ -90,8 +93,8 @@ export const Root = ({ store }: { store: DocumentStore }) => {
     };
   }, [store]);
 
-  if (route.name === "editor") {
-    return (
+  const content =
+    route.name === "editor" ? (
       <EditorScreen
         key={route.docId}
         store={store}
@@ -100,16 +103,25 @@ export const Root = ({ store }: { store: DocumentStore }) => {
           window.location.hash = "#/";
         }}
       />
+    ) : (
+      <DocumentBrowser
+        store={store}
+        onOpen={(documentId) => {
+          window.location.hash = `#/doc/${encodeURIComponent(documentId)}`;
+        }}
+      />
     );
-  }
 
   return (
-    <DocumentBrowser
-      store={store}
-      onOpen={(documentId) => {
-        window.location.hash = `#/doc/${encodeURIComponent(documentId)}`;
-      }}
-    />
+    <>
+      {content}
+      <UpdateBanner
+        update={update}
+        clientVersion={clientVersion}
+        onUpdate={openUpdate}
+        onDismiss={dismiss}
+      />
+    </>
   );
 };
 
