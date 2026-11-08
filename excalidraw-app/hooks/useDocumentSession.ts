@@ -1,13 +1,13 @@
 import { debounce } from "@excalidraw/common";
 import { getNonDeletedElements } from "@excalidraw/element";
 import { exportScene } from "@excalidraw/excalidraw";
-import { restoreAppState, restoreElements } from "@excalidraw/excalidraw/data/restore";
+import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
+import {
+  restoreAppState,
+  restoreElements,
+} from "@excalidraw/excalidraw/data/restore";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
-import { SAVE_DEBOUNCE_MS } from "../app_constants";
-
-import { NativeFileManager } from "../storage/NativeFileManager";
 
 import type {
   AppState,
@@ -15,7 +15,12 @@ import type {
   ExcalidrawInitialDataState,
   ExcalidrawProps,
 } from "@excalidraw/excalidraw/types";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { SAVE_DEBOUNCE_MS } from "../app_constants";
+
+import { NativeFileManager } from "../storage/NativeFileManager";
 
 import type { DocumentStore } from "../storage/types";
 
@@ -63,7 +68,10 @@ export const useDocumentSession = (docId: string, store: DocumentStore) => {
           repairBindings: true,
           deleteInvisibleElements: true,
         });
-        const appState = restoreAppState(scene?.appState ?? null, null);
+        const appState = {
+          ...getDefaultAppState(),
+          ...restoreAppState(scene?.appState ?? null, null),
+        } as AppState;
         const filesMap: BinaryFiles = {};
         for (const file of files) {
           filesMap[file.id] = file;
@@ -110,7 +118,6 @@ export const useDocumentSession = (docId: string, store: DocumentStore) => {
         },
         config: {
           maxWidthOrHeight: 512,
-          exportPadding: 10,
         },
       });
       await store.saveThumbnail(docId, blob);

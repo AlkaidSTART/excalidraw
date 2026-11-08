@@ -1,8 +1,9 @@
+import type { FileId } from "@excalidraw/element/types";
+
+import type { BinaryFiles } from "@excalidraw/excalidraw/types";
+
 import { FileManager } from "../data/FileManager";
 import { FileStatusStore } from "../data/fileStatusStore";
-
-import type { FileId } from "@excalidraw/element/types";
-import type { BinaryFiles } from "@excalidraw/excalidraw/types";
 
 import type { DocumentStore } from "./types";
 

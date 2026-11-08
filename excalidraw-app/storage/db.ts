@@ -86,9 +86,7 @@ export const bytesToDataUrl = (bytes: Uint8Array, mimeType: string) => {
   let binary = "";
 
   for (let index = 0; index < bytes.length; index += chunkSize) {
-    binary += String.fromCharCode(
-      ...bytes.subarray(index, index + chunkSize),
-    );
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
   }
 
   return `data:${mimeType};base64,${btoa(binary)}`;

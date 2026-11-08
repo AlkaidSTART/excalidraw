@@ -1,6 +1,5 @@
 import { serializeAsJSON } from "@excalidraw/excalidraw";
 
-import type Database from "@tauri-apps/plugin-sql";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type {
@@ -10,6 +9,8 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import { bytesToDataUrl, dataUrlToBytes, toUint8Array } from "./db";
+
+import type Database from "@tauri-apps/plugin-sql";
 
 import type {
   DocumentMeta,
@@ -51,8 +52,11 @@ const toMeta = (row: DocumentRow): DocumentMeta => ({
 
 const toFileData = (row: FileRow): BinaryFileData => ({
   id: row.file_id as FileId,
-  mimeType: row.mime_type,
-  dataURL: bytesToDataUrl(toUint8Array(row.data), row.mime_type),
+  mimeType: row.mime_type as BinaryFileData["mimeType"],
+  dataURL: bytesToDataUrl(
+    toUint8Array(row.data),
+    row.mime_type,
+  ) as BinaryFileData["dataURL"],
   created: row.created,
   lastRetrieved: row.last_retrieved ?? undefined,
   version: 1,
@@ -88,7 +92,10 @@ export class DocumentRepository implements DocumentStore {
     return rows[0] ? toMeta(rows[0]) : null;
   }
 
-  async create(name = "Untitled", id = crypto.randomUUID()): Promise<DocumentMeta> {
+  async create(
+    name = "Untitled",
+    id = crypto.randomUUID(),
+  ): Promise<DocumentMeta> {
     const now = Date.now();
     await this.database.execute(
       `INSERT OR IGNORE INTO documents (id, name, created_at, updated_at)
@@ -342,7 +349,8 @@ export class DocumentRepository implements DocumentStore {
     if (!rows[0]) {
       return null;
     }
-    return new Blob([toUint8Array(rows[0].data)], { type: "image/png" });
+    const bytes = toUint8Array(rows[0].data);
+    return new Blob([bytes as unknown as BlobPart], { type: "image/png" });
   }
 
   async deleteObsoleteFiles(

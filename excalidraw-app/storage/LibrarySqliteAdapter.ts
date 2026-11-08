@@ -1,11 +1,8 @@
+import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
+
 import { exec, select } from "./db";
 
-import type {
-  LibraryPersistenceAdapter,
-  LibraryPersistedData,
-} from "@excalidraw/excalidraw/data/library";
-
-export class LibrarySqliteAdapter implements LibraryPersistenceAdapter {
+export class LibrarySqliteAdapter {
   static async load(): Promise<LibraryPersistedData | null> {
     const rows = await select<{ data: string }[]>(
       `SELECT data FROM library WHERE id = 1`,

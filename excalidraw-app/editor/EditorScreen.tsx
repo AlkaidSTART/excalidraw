@@ -14,6 +14,8 @@ import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/Overwr
 import { isElementLink } from "@excalidraw/element";
 import { useCallback, useState } from "react";
 
+import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
+
 import { AppMainMenu } from "../components/AppMainMenu";
 import { AppWelcomeScreen } from "../components/AppWelcomeScreen";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
@@ -22,8 +24,6 @@ import { useDocumentSession } from "../hooks/useDocumentSession";
 import { useAppLangCode } from "../app-language/language-state";
 import { isTauriMobile } from "../tauri";
 import { useHandleAppTheme } from "../useHandleAppTheme";
-
-import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
 
 import type { DocumentStore } from "../storage/types";
 
@@ -103,14 +103,14 @@ const ExcalidrawWrapper = ({
         autoFocus={true}
         theme={editorTheme}
         onThemeChange={setAppTheme}
-        UIOptions={{
-          getFormFactor: (width, height) =>
-            isTauriMobile()
-              ? width >= 900 && height >= 600
-                ? "tablet"
-                : "phone"
-              : undefined,
-        }}
+        UIOptions={
+          isTauriMobile()
+            ? {
+                getFormFactor: (width, height) =>
+                  width >= 900 && height >= 600 ? "tablet" : "phone",
+              }
+            : {}
+        }
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();

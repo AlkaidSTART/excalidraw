@@ -1,7 +1,11 @@
 import { serializeAsJSON } from "@excalidraw/excalidraw";
 
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
-import type { AppState, BinaryFileData, BinaryFiles } from "@excalidraw/excalidraw/types";
+import type {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+} from "@excalidraw/excalidraw/types";
 
 import type {
   DocumentMeta,
@@ -31,7 +35,10 @@ export class MemoryDocumentStore implements DocumentStore {
     return this.documents.get(id)?.meta ?? null;
   }
 
-  async create(name = "Untitled", id = crypto.randomUUID()): Promise<DocumentMeta> {
+  async create(
+    name = "Untitled",
+    id = crypto.randomUUID(),
+  ): Promise<DocumentMeta> {
     const existing = this.documents.get(id);
     if (existing) {
       return existing.meta;

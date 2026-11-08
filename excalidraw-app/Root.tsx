@@ -1,4 +1,8 @@
+import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
+
 import { useCallback, useEffect, useState } from "react";
+
+import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { EditorScreen } from "./editor/EditorScreen";
 import { DocumentBrowser } from "./home/DocumentBrowser";
@@ -61,7 +65,10 @@ export const Root = ({ store }: { store: DocumentStore }) => {
           name.replace(/\.(excalidraw|json)$/i, "") || "Imported",
         );
 
-        await store.saveScene(document.id, data.elements, data.appState);
+        await store.saveScene(document.id, data.elements, {
+          ...getDefaultAppState(),
+          ...data.appState,
+        } as AppState);
         await store.saveFiles(document.id, data.files);
         window.location.hash = `#/doc/${encodeURIComponent(document.id)}`;
       } catch (error) {

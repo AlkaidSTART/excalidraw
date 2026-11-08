@@ -1,5 +1,9 @@
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
-import type { AppState, BinaryFileData, BinaryFiles } from "@excalidraw/excalidraw/types";
+import type {
+  AppState,
+  BinaryFileData,
+  BinaryFiles,
+} from "@excalidraw/excalidraw/types";
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 
 import { LibrarySqliteAdapter } from "./LibrarySqliteAdapter";
@@ -143,26 +147,22 @@ export const runLegacyMigration = async (store: DocumentStore) => {
     "files-db",
     "files-store",
   );
-  const legacyLibraryIndexedDB = await readAllFromIndexedDB<LibraryPersistedData>(
-    "excalidraw-library-db",
-    "excalidraw-library-store",
-  );
+  const legacyLibraryIndexedDB =
+    await readAllFromIndexedDB<LibraryPersistedData>(
+      "excalidraw-library-db",
+      "excalidraw-library-store",
+    );
   const legacyChatsIndexedDB = await readAllFromIndexedDB<unknown>(
     "excalidraw-ttd-chats-db",
     "excalidraw-ttd-chats-store",
   );
 
-  const hasScene =
-    elements.length > 0 || Object.keys(appState).length > 0;
+  const hasScene = elements.length > 0 || Object.keys(appState).length > 0;
 
   if (hasScene) {
     await store.create("Recovered drawing", LEGACY_DOCUMENT_ID);
 
-    await store.saveScene(
-      LEGACY_DOCUMENT_ID,
-      elements,
-      appState as AppState,
-    );
+    await store.saveScene(LEGACY_DOCUMENT_ID, elements, appState as AppState);
 
     if (legacyFiles.length) {
       const files: BinaryFiles = {};
@@ -177,10 +177,7 @@ export const runLegacyMigration = async (store: DocumentStore) => {
     }
   }
 
-  const library = normalizeLibrary(
-    legacyLibrary,
-    legacyLibraryIndexedDB,
-  );
+  const library = normalizeLibrary(legacyLibrary, legacyLibraryIndexedDB);
   if (library) {
     await LibrarySqliteAdapter.save(library);
   }

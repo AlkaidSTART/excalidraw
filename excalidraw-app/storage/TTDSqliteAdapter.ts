@@ -1,11 +1,8 @@
+import type { SavedChats } from "@excalidraw/excalidraw/components/TTDDialog/types";
+
 import { exec, select } from "./db";
 
-import type {
-  SavedChats,
-  TTDPersistenceAdapter,
-} from "@excalidraw/excalidraw/components/TTDDialog/types";
-
-export class TTDSqliteAdapter implements TTDPersistenceAdapter {
+export class TTDSqliteAdapter {
   static async loadChats(): Promise<SavedChats> {
     const rows = await select<{ data: string }[]>(
       `SELECT data FROM ttd_chats WHERE id = 1`,

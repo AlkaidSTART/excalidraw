@@ -1,9 +1,12 @@
+import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import { restoreAppState } from "@excalidraw/excalidraw/data/restore";
 import { saveAsJSON } from "@excalidraw/excalidraw/data/json";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { fileOpen } from "@excalidraw/excalidraw/data/filesystem";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { DocumentCard } from "./DocumentCard";
 import { HomeHeader } from "./HomeHeader";
@@ -123,11 +126,10 @@ export const DocumentBrowser = ({
       const data = await loadFromBlob(file, null, null);
       const name = file.name.replace(/\.(excalidraw|json)$/i, "") || "Imported";
       const document = await store.create(name);
-      await store.saveScene(
-        document.id,
-        data.elements,
-        data.appState,
-      );
+      await store.saveScene(document.id, data.elements, {
+        ...getDefaultAppState(),
+        ...data.appState,
+      } as AppState);
       await store.saveFiles(document.id, data.files);
       onOpen(document.id);
     } catch (importError: any) {
@@ -157,8 +159,13 @@ export const DocumentBrowser = ({
         if (!scene) {
           return;
         }
-        const appState = restoreAppState(scene.appState ?? null, null);
-        const filesMap = Object.fromEntries(files.map((file) => [file.id, file]));
+        const appState = {
+          ...getDefaultAppState(),
+          ...restoreAppState(scene.appState ?? null, null),
+        } as AppState;
+        const filesMap = Object.fromEntries(
+          files.map((file) => [file.id, file]),
+        );
         await saveAsJSON({
           data: {
             elements: scene.elements ?? [],
@@ -282,7 +289,10 @@ export const DocumentBrowser = ({
                   }}
                 />
                 <div className="app-dialog__actions">
-                  <button type="button" onClick={() => setDialog({ type: "none" })}>
+                  <button
+                    type="button"
+                    onClick={() => setDialog({ type: "none" })}
+                  >
                     Cancel
                   </button>
                   <button type="button" onClick={() => void confirmRename()}>
@@ -295,7 +305,10 @@ export const DocumentBrowser = ({
                 <h2>Delete “{dialog.document.name}”?</h2>
                 <p>This removes the drawing and its images from this device.</p>
                 <div className="app-dialog__actions">
-                  <button type="button" onClick={() => setDialog({ type: "none" })}>
+                  <button
+                    type="button"
+                    onClick={() => setDialog({ type: "none" })}
+                  >
                     Cancel
                   </button>
                   <button type="button" onClick={() => void confirmDelete()}>
