@@ -1,0 +1,127 @@
+name: Tauri Build
+
+on:
+  push:
+    branches: master
+  workflow_dispatch:
+
+concurrency:
+  group: tauri-build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  macos-dmg:
+    name: macOS DMG
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build DMG
+        run: yarn tauri build --bundles dmg
+        env:
+          # ad-hoc signature, no Apple Developer certificate required
+          APPLE_SIGNING_IDENTITY: "-"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: excalidraw-macos-dmg
+          path: src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+
+  android-apk:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager --install "platform-tools" "platforms;android-37.0" "build-tools;37.0.0" "ndk;27.1.12297006"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Configure Android signing
+        working-directory: src-tauri/gen/android
+        env:
+          ANDROID_KEY_BASE64: ${{ secrets.ANDROID_KEY_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$ANDROID_KEY_BASE64" ]; then
+            echo "$ANDROID_KEY_BASE64" | base64 -d > "$RUNNER_TEMP/keystore.jks"
+            key_alias="${ANDROID_KEY_ALIAS:-upload}"
+            key_password="$ANDROID_KEY_PASSWORD"
+          else
+            echo "::warning::ANDROID_KEY_BASE64 is not set, signing with a throwaway key. Installing an update will require uninstalling the previous APK."
+            keytool -genkeypair \
+              -keystore "$RUNNER_TEMP/keystore.jks" \
+              -storepass excalidraw \
+              -keypass excalidraw \
+              -alias excalidraw \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Excalidraw"
+            key_alias=excalidraw
+            key_password=excalidraw
+          fi
+
+          cat > keystore.properties <<EOF
+          keyAlias=$key_alias
+          password=$key_password
+          storeFile=$RUNNER_TEMP/keystore.jks
+          EOF
+
+      - name: Build APK
+        run: |
+          export NDK_HOME="$ANDROID_HOME/ndk/27.1.12297006"
+          yarn tauri android build --apk --split-per-abi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: excalidraw-android-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error

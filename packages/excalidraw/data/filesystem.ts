@@ -10,6 +10,33 @@ import { normalizeFile } from "./blob";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
+export type FileSaveOptions = {
+  /** supply without the extension */
+  name: string;
+  /** file extension */
+  extension: FILE_EXTENSION;
+  mimeTypes?: string[];
+  description: string;
+  /** existing FileSystemFileHandle */
+  fileHandle?: FileSystemFileHandle | null;
+};
+
+/**
+ * Native shells (Tauri, Electron, Capacitor) can't rely on the browser
+ * download fallback used by `browser-fs-access`, so they register their own
+ * saver here.
+ */
+export type HostFileSaver = (
+  blob: Blob,
+  opts: FileSaveOptions,
+) => Promise<FileSystemFileHandle | null>;
+
+let hostFileSaver: HostFileSaver | null = null;
+
+export const setHostFileSaver = (saver: HostFileSaver | null) => {
+  hostFileSaver = saver;
+};
+
 export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
@@ -20,7 +47,6 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
 
   const mimeTypes = opts.extensions?.reduce((mimeTypes, type) => {
     mimeTypes.push(MIME_TYPES[type]);
-
     return mimeTypes;
   }, [] as string[]);
 
@@ -46,19 +72,14 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   return (await normalizeFile(files)) as RetType;
 };
 
-export const fileSave = (
+export const fileSave = async (
   blob: Blob | Promise<Blob>,
-  opts: {
-    /** supply without the extension */
-    name: string;
-    /** file extension */
-    extension: FILE_EXTENSION;
-    mimeTypes?: string[];
-    description: string;
-    /** existing FileSystemFileHandle */
-    fileHandle?: FileSystemFileHandle | null;
-  },
+  opts: FileSaveOptions,
 ) => {
+  if (hostFileSaver) {
+    return hostFileSaver(await blob, opts);
+  }
+
   return _fileSave(
     blob,
     {
