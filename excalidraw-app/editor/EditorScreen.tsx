@@ -18,7 +18,6 @@ import { AppMainMenu } from "../components/AppMainMenu";
 import { AppWelcomeScreen } from "../components/AppWelcomeScreen";
 import { TopErrorBoundary } from "../components/TopErrorBoundary";
 import { FileStatusStore } from "../data/fileStatusStore";
-import { updateStaleImageStatuses } from "../data/FileManager";
 import { useDocumentSession } from "../hooks/useDocumentSession";
 import { useAppLangCode } from "../app-language/language-state";
 import { isTauriMobile } from "../tauri";

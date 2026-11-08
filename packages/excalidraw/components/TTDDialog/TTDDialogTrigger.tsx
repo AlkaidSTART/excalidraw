@@ -10,9 +10,11 @@ import type { JSX, ReactNode } from "react";
 export const TTDDialogTrigger = ({
   children,
   icon,
+  tab = "text-to-diagram",
 }: {
   children?: ReactNode;
   icon?: JSX.Element;
+  tab?: "text-to-diagram" | "mermaid";
 }) => {
   const { t } = useI18n();
   const { TTDDialogTriggerTunnel } = useTunnels();
@@ -22,13 +24,22 @@ export const TTDDialogTrigger = ({
     <TTDDialogTriggerTunnel.In>
       <DropdownMenu.Item
         onSelect={() => {
-          trackEvent("ai", "dialog open", "ttd");
-          setAppState({ openDialog: { name: "ttd", tab: "text-to-diagram" } });
+          if (tab === "text-to-diagram") {
+            trackEvent("ai", "dialog open", "ttd");
+          }
+          setAppState({ openDialog: { name: "ttd", tab } });
         }}
         icon={icon ?? brainIcon}
-        badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
+        badge={
+          tab === "text-to-diagram" ? (
+            <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
+          ) : undefined
+        }
       >
-        {children ?? t("labels.textToDiagram")}
+        {children ??
+          (tab === "mermaid"
+            ? t("mermaid.label")
+            : t("labels.textToDiagram"))}
       </DropdownMenu.Item>
     </TTDDialogTriggerTunnel.In>
   );

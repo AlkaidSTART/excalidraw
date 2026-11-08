@@ -1,48 +1,30 @@
-import Trans from "@excalidraw/excalidraw/components/Trans";
-import { t } from "@excalidraw/excalidraw/i18n";
-import * as Sentry from "@sentry/browser";
 import React from "react";
 
-interface TopErrorBoundaryState {
+type TopErrorBoundaryState = {
   hasError: boolean;
-  sentryEventId: string;
-  localStorage: string;
-}
+  message: string;
+  stack?: string;
+};
 
 export class TopErrorBoundary extends React.Component<
-  any,
+  { children: React.ReactNode },
   TopErrorBoundaryState
 > {
   state: TopErrorBoundaryState = {
     hasError: false,
-    sentryEventId: "",
-    localStorage: "",
+    message: "",
   };
 
-  render() {
-    return this.state.hasError ? this.errorSplash() : this.props.children;
+  static getDerivedStateFromError(error: Error): TopErrorBoundaryState {
+    return {
+      hasError: true,
+      message: error.message,
+      stack: error.stack,
+    };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
-    const _localStorage: any = {};
-    for (const [key, value] of Object.entries({ ...localStorage })) {
-      try {
-        _localStorage[key] = JSON.parse(value);
-      } catch (error: any) {
-        _localStorage[key] = value;
-      }
-    }
-
-    Sentry.withScope((scope) => {
-      scope.setExtras(errorInfo);
-      const eventId = Sentry.captureException(error);
-
-      this.setState((state) => ({
-        hasError: true,
-        sentryEventId: eventId,
-        localStorage: JSON.stringify(_localStorage),
-      }));
-    });
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Uncaught error", error, errorInfo);
   }
 
   private selectTextArea(event: React.MouseEvent<HTMLTextAreaElement>) {
@@ -52,91 +34,32 @@ export class TopErrorBoundary extends React.Component<
     }
   }
 
-  private async createGithubIssue() {
-    let body = "";
-    try {
-      const templateStrFn = (
-        await import(
-          /* webpackChunkName: "bug-issue-template" */ "../bug-issue-template"
-        )
-      ).default;
-      body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
-    } catch (error: any) {
-      console.error(error);
+  render() {
+    if (!this.state.hasError) {
+      return this.props.children;
     }
 
-    window.open(
-      `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`,
-      "_blank",
-      "noopener noreferrer",
-    );
-  }
-
-  private errorSplash() {
     return (
       <div className="ErrorSplash excalidraw">
         <div className="ErrorSplash-messageContainer">
           <div className="ErrorSplash-paragraph bigger align-center">
-            <Trans
-              i18nKey="errorSplash.headingMain"
-              button={(el) => (
-                <button onClick={() => window.location.reload()}>{el}</button>
-              )}
-            />
+            Something went wrong.
           </div>
           <div className="ErrorSplash-paragraph align-center">
-            <Trans
-              i18nKey="errorSplash.clearCanvasMessage"
-              button={(el) => (
-                <button
-                  onClick={() => {
-                    try {
-                      localStorage.clear();
-                      window.location.reload();
-                    } catch (error: any) {
-                      console.error(error);
-                    }
-                  }}
-                >
-                  {el}
-                </button>
-              )}
-            />
-            <br />
-            <div className="smaller">
-              <span role="img" aria-label="warning">
-                ⚠️
-              </span>
-              {t("errorSplash.clearCanvasCaveat")}
-              <span role="img" aria-hidden="true">
-                ⚠️
-              </span>
-            </div>
+            Your drawings are stored locally. Reload the app to continue.
           </div>
-          <div>
-            <div className="ErrorSplash-paragraph">
-              {t("errorSplash.trackedToSentry", {
-                eventId: this.state.sentryEventId,
-              })}
-            </div>
-            <div className="ErrorSplash-paragraph">
-              <Trans
-                i18nKey="errorSplash.openIssueMessage"
-                button={(el) => (
-                  <button onClick={() => this.createGithubIssue()}>{el}</button>
-                )}
+          <div className="ErrorSplash-paragraph align-center">
+            <button onClick={() => window.location.reload()}>Reload</button>
+          </div>
+          <div className="ErrorSplash-paragraph">
+            <div className="ErrorSplash-details">
+              <label>Error details</label>
+              <textarea
+                rows={6}
+                readOnly
+                onPointerDown={this.selectTextArea}
+                value={`${this.state.message}\n\n${this.state.stack ?? ""}`}
               />
-            </div>
-            <div className="ErrorSplash-paragraph">
-              <div className="ErrorSplash-details">
-                <label>{t("errorSplash.sceneContent")}</label>
-                <textarea
-                  rows={5}
-                  onPointerDown={this.selectTextArea}
-                  readOnly={true}
-                  value={this.state.localStorage}
-                />
-              </div>
             </div>
           </div>
         </div>

@@ -3571,25 +3571,6 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private initializeScene = async () => {
-    if (
-      "launchQueue" in this.ownerWindow &&
-      "LaunchParams" in this.ownerWindow
-    ) {
-      (this.ownerWindow as any).launchQueue.setConsumer(
-        async (launchParams: { files: any[] }) => {
-          if (!launchParams.files.length) {
-            return;
-          }
-          const fileHandle = launchParams.files[0];
-          const blob: Blob = await fileHandle.getFile();
-          this.loadFileToCanvas(
-            new File([blob], blob.name || "", { type: blob.type }),
-            fileHandle,
-          );
-        },
-      );
-    }
-
     if (this.props.theme) {
       this.setState({ theme: this.props.theme });
     }
@@ -3878,16 +3859,7 @@ class App extends React.Component<AppProps, AppState> {
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
 
-    const searchParams = new URLSearchParams(
-      this.ownerWindow.location.search.slice(1),
-    );
-
-    if (searchParams.has("web-share-target")) {
-      // Obtain a file that was shared via the Web Share Target API.
-      this.restoreFileFromShare();
-    } else {
-      this.updateDOMRect(this.initializeScene);
-    }
+    this.updateDOMRect(this.initializeScene);
 
     // note that this check seems to always pass in localhost
     if (isBrave() && !isMeasureTextSupported()) {
@@ -3933,8 +3905,6 @@ class App extends React.Component<AppProps, AppState> {
     this.props.onExcalidrawAPI?.(null);
     this.elementRenderOverrides = new Map();
     this.elementRenderOffsets = new Map();
-
-    (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
 
     this.host.destroy();
 
@@ -4900,27 +4870,6 @@ class App extends React.Component<AppProps, AppState> {
       duration: 8000,
     });
   }
-
-  restoreFileFromShare = async () => {
-    try {
-      const webShareTargetCache = await caches.open("web-share-target");
-
-      const response = await webShareTargetCache.match("shared-file");
-      if (response) {
-        const blob = await response.blob();
-        const file = new File([blob], blob.name || "", { type: blob.type });
-        this.loadFileToCanvas(file, null);
-        await webShareTargetCache.delete("shared-file");
-        this.ownerWindow.history.replaceState(
-          null,
-          APP_NAME,
-          this.ownerWindow.location.pathname,
-        );
-      }
-    } catch (error: any) {
-      this.setState({ errorMessage: error.message });
-    }
-  };
 
   /**
    * adds supplied files to existing files in the appState.
