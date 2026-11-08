@@ -1,15 +1,43 @@
 import { isTauri } from "@tauri-apps/api/core";
 
-import { setHostFileSaver } from "@excalidraw/excalidraw/data/filesystem";
+import {
+  setHostFileOpener,
+  setHostFileSaver,
+} from "@excalidraw/excalidraw/data/filesystem";
 
 const EXTERNAL_PROTOCOLS = /^(https?|mailto|tel):/i;
 
 export const isRunningInTauri = () => isTauri();
 
+export const isTauriMobile = () => {
+  if (!isRunningInTauri()) {
+    return false;
+  }
+
+  const userAgent = navigator.userAgent;
+  return (
+    /Android|iPhone|iPad|iPod/i.test(userAgent) ||
+    (navigator.maxTouchPoints > 1 && /Macintosh/i.test(userAgent))
+  );
+};
+
+export const listenForOpenFile = async (
+  onOpenFile: (paths: string[]) => void,
+) => {
+  if (!isRunningInTauri()) {
+    return () => {};
+  }
+
+  const { listen } = await import("@tauri-apps/api/event");
+  return listen<string[]>("open-file", (event) => {
+    onOpenFile(event.payload);
+  });
+};
+
 /**
  * Wires the editor into the native shell:
- * - saves files through the system save dialog (browser downloads don't work
- *   inside the Tauri webview)
+ * - saves files through the system save dialog
+ * - opens files through the system open dialog
  * - opens external links in the system browser instead of navigating away
  *
  * The Tauri plugins are imported lazily so they only load in the native shell.
@@ -37,6 +65,40 @@ export const installTauriIntegrations = () => {
     await writeFile(path, new Uint8Array(await blob.arrayBuffer()));
     // the webview has no persistent FileSystemFileHandle to hand back
     return null;
+  });
+
+  setHostFileOpener(async (opts) => {
+    const [{ open }, { readFile }] = await Promise.all([
+      import("@tauri-apps/plugin-dialog"),
+      import("@tauri-apps/plugin-fs"),
+    ]);
+
+    const extensions = opts.extensions?.flatMap((extension) =>
+      extension === "jpg" ? ["jpg", "jpeg"] : [extension],
+    );
+
+    const selected = await open({
+      multiple: opts.multiple ?? false,
+      directory: false,
+      filters: extensions?.length
+        ? [{ name: opts.description, extensions }]
+        : undefined,
+    });
+
+    if (!selected) {
+      return null;
+    }
+
+    const paths = Array.isArray(selected) ? selected : [selected];
+    const files = await Promise.all(
+      paths.map(async (path) => {
+        const bytes = await readFile(path);
+        const name = path.split(/[\\/]/).pop() || "file";
+        return new File([bytes], name, { type: "" });
+      }),
+    );
+
+    return opts.multiple ? files : files[0];
   });
 
   const openExternal = (url: string) => {

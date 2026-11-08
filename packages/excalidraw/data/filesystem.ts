@@ -37,6 +37,18 @@ export const setHostFileSaver = (saver: HostFileSaver | null) => {
   hostFileSaver = saver;
 };
 
+export type HostFileOpener = (opts: {
+  extensions?: FILE_EXTENSION[];
+  description: string;
+  multiple?: boolean;
+}) => Promise<File | File[] | null>;
+
+let hostFileOpener: HostFileOpener | null = null;
+
+export const setHostFileOpener = (opener: HostFileOpener | null) => {
+  hostFileOpener = opener;
+};
+
 export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
   description: string;
@@ -44,6 +56,26 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
 }): Promise<M extends false | undefined ? File : File[]> => {
   // an unsafe TS hack, alas not much we can do AFAIK
   type RetType = M extends false | undefined ? File : File[];
+
+  if (hostFileOpener) {
+    const result = await hostFileOpener({
+      extensions: opts.extensions,
+      description: opts.description,
+      multiple: opts.multiple ?? false,
+    });
+
+    if (result === null) {
+      throw new DOMException("The user aborted a request.", "AbortError");
+    }
+
+    if (Array.isArray(result)) {
+      return (await Promise.all(
+        result.map((file) => normalizeFile(file)),
+      )) as RetType;
+    }
+
+    return (await normalizeFile(result)) as RetType;
+  }
 
   const mimeTypes = opts.extensions?.reduce((mimeTypes, type) => {
     mimeTypes.push(MIME_TYPES[type]);

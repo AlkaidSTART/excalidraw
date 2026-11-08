@@ -433,6 +433,10 @@ export type {
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
+  setHostFileOpener,
+  setHostFileSaver,
+} from "./data/filesystem";
+export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
