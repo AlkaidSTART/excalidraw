@@ -162,6 +162,12 @@ export const fetchLatestRelease = async ({
 };
 
 const resolveClientVersion = async (): Promise<string> => {
+  const bundledVersion =
+    typeof __APP_VERSION__ === "string" ? __APP_VERSION__.trim() : "";
+  if (bundledVersion) {
+    return bundledVersion;
+  }
+
   if (isRunningInTauri()) {
     try {
       const { getVersion } = await import("@tauri-apps/api/app");
@@ -171,7 +177,7 @@ const resolveClientVersion = async (): Promise<string> => {
     }
   }
 
-  return typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "0.0.0";
+  return "0.0.0";
 };
 
 let clientVersionPromise: Promise<string> | null = null;
