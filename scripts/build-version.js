@@ -3,7 +3,6 @@
 const fs = require("fs");
 const path = require("path");
 const versionFile = path.join("build", "version.json");
-const indexFile = path.join("build", "index.html");
 
 const versionDate = (date) => date.toISOString().replace(".000", "");
 
@@ -45,17 +44,3 @@ const data = JSON.stringify(
 );
 
 fs.writeFileSync(versionFile, data);
-
-// https://stackoverflow.com/a/14181136/8418
-fs.readFile(indexFile, "utf8", (error, data) => {
-  if (error) {
-    return console.error(error);
-  }
-  const result = data.replace(/{version}/g, getFullVersion());
-
-  fs.writeFile(indexFile, result, "utf8", (error) => {
-    if (error) {
-      return console.error(error);
-    }
-  });
-});

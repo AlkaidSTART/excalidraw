@@ -19,9 +19,7 @@ window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 
 try {
   const storedTheme = localStorage.getItem("excalidraw-theme") ?? "light";
-  const prefersDark = window.matchMedia(
-    "(prefers-color-scheme: dark)",
-  ).matches;
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   document.documentElement.classList.toggle(
     "dark",
     storedTheme === "dark" || (storedTheme === "system" && prefersDark),

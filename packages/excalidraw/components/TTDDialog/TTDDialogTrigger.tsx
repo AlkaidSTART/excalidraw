@@ -37,9 +37,7 @@ export const TTDDialogTrigger = ({
         }
       >
         {children ??
-          (tab === "mermaid"
-            ? t("mermaid.label")
-            : t("labels.textToDiagram"))}
+          (tab === "mermaid" ? t("mermaid.label") : t("labels.textToDiagram"))}
       </DropdownMenu.Item>
     </TTDDialogTriggerTunnel.In>
   );
