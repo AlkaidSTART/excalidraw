@@ -7,6 +7,7 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 import { EditorScreen } from "./editor/EditorScreen";
 import { DocumentBrowser } from "./home/DocumentBrowser";
 import { useAndroidBack } from "./hooks/useAndroidBack";
+import { useKeyboardInset } from "./hooks/useKeyboardInset";
 import { listenForOpenFile } from "./tauri";
 
 import type { DocumentStore } from "./storage/types";
@@ -38,6 +39,7 @@ export const Root = ({ store }: { store: DocumentStore }) => {
   }, [route.name]);
 
   useAndroidBack(handleBack);
+  useKeyboardInset();
 
   useEffect(() => {
     let unlisten: (() => void) | undefined;

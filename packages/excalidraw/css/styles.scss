@@ -324,7 +324,7 @@ body.excalidraw-cursor-resize * {
     // account for margins
     width: calc(100% - 28px);
     max-width: 450px;
-    bottom: 0;
+    bottom: calc(var(--sab, 0px) + var(--keyboard-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     --bar-padding: calc(4 * var(--space-factor));

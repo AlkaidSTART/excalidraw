@@ -143,10 +143,20 @@ export class AppText {
       // the styles panel isn't shown yet when pasting with nothing selected
       { reserve: { stylesPanel: true } },
     );
+
+    // --keyboard-inset-bottom is set by the native host when the soft
+    // keyboard overlaps the WebView (Android/iOS don't always resize it).
+    const keyboardInset =
+      Number.parseFloat(
+        this.app.ownerWindow
+          .getComputedStyle(this.app.ownerDocument.documentElement)
+          .getPropertyValue("--keyboard-inset-bottom"),
+      ) || 0;
+
     return {
       top: padding,
       right: right + padding,
-      bottom: padding,
+      bottom: padding + keyboardInset,
       left: left + padding,
     };
   };

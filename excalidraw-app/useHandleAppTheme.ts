@@ -38,13 +38,18 @@ export const useHandleAppTheme = () => {
   useLayoutEffect(() => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_THEME, appTheme);
 
-    if (appTheme === "system") {
-      setEditorTheme(
-        getDarkThemeMediaQuery()?.matches ? THEME.DARK : THEME.LIGHT,
-      );
-    } else {
-      setEditorTheme(appTheme);
-    }
+    const resolvedTheme =
+      appTheme === "system"
+        ? getDarkThemeMediaQuery()?.matches
+          ? THEME.DARK
+          : THEME.LIGHT
+        : appTheme;
+
+    setEditorTheme(resolvedTheme);
+    document.documentElement.classList.toggle(
+      "dark",
+      resolvedTheme === THEME.DARK,
+    );
   }, [appTheme]);
 
   return { editorTheme, appTheme, setAppTheme };

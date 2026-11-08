@@ -535,6 +535,11 @@ export const textWysiwyg = ({
   editable.dir = "auto";
   editable.tabIndex = 0;
   editable.dataset.type = "wysiwyg";
+  editable.inputMode = "text";
+  editable.spellcheck = false;
+  editable.setAttribute("enterkeyhint", "enter");
+  editable.setAttribute("autocapitalize", "off");
+  editable.setAttribute("autocorrect", "off");
   // prevent line wrapping on Safari
   editable.wrap = "off";
   editable.classList.add("excalidraw-wysiwyg");

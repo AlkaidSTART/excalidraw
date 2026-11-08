@@ -17,6 +17,19 @@ polyfill();
 window.EXCALIDRAW_THROTTLE_RENDER = true;
 window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 
+try {
+  const storedTheme = localStorage.getItem("excalidraw-theme") ?? "light";
+  const prefersDark = window.matchMedia(
+    "(prefers-color-scheme: dark)",
+  ).matches;
+  document.documentElement.classList.toggle(
+    "dark",
+    storedTheme === "dark" || (storedTheme === "system" && prefersDark),
+  );
+} catch (error) {
+  console.warn("Failed to restore theme", error);
+}
+
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
 
