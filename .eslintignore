@@ -9,3 +9,5 @@ packages/excalidraw/types
 examples/**/public
 dev-dist
 coverage
+src-tauri/target
+src-tauri/gen
