@@ -67,6 +67,9 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # the default `tools` package was removed from Google's SDK repository
+          packages: platform-tools
 
       - name: Install Android SDK packages
         run: |
@@ -76,7 +79,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+          targets: aarch64-linux-android,armv7-linux-androideabi
 
       - uses: swatinem/rust-cache@v2
         with:
@@ -118,7 +121,7 @@ jobs:
       - name: Build APK
         run: |
           export NDK_HOME="$ANDROID_HOME/ndk/27.1.12297006"
-          yarn tauri android build --apk --split-per-abi
+          yarn tauri android build --apk --target aarch64 armv7
 
       - uses: actions/upload-artifact@v4
         with:
