@@ -19,9 +19,7 @@ if (!isRunningInTauri()) {
   registerSW();
 }
 
-installTauriIntegrations().catch((error) => {
-  console.error("Failed to install Tauri integrations", error);
-});
+installTauriIntegrations();
 
 root.render(
   <StrictMode>

@@ -11,19 +11,20 @@ export const isRunningInTauri = () => isTauri();
  * - saves files through the system save dialog (browser downloads don't work
  *   inside the Tauri webview)
  * - opens external links in the system browser instead of navigating away
+ *
+ * The Tauri plugins are imported lazily so they only load in the native shell.
  */
-export const installTauriIntegrations = async () => {
+export const installTauriIntegrations = () => {
   if (!isRunningInTauri()) {
     return;
   }
 
-  const [{ save }, { writeFile }, { openUrl }] = await Promise.all([
-    import("@tauri-apps/plugin-dialog"),
-    import("@tauri-apps/plugin-fs"),
-    import("@tauri-apps/plugin-opener"),
-  ]);
-
   setHostFileSaver(async (blob, opts) => {
+    const [{ save }, { writeFile }] = await Promise.all([
+      import("@tauri-apps/plugin-dialog"),
+      import("@tauri-apps/plugin-fs"),
+    ]);
+
     const path = await save({
       defaultPath: `${opts.name}.${opts.extension}`,
       filters: [{ name: opts.description, extensions: [opts.extension] }],
@@ -39,9 +40,11 @@ export const installTauriIntegrations = async () => {
   });
 
   const openExternal = (url: string) => {
-    void openUrl(url).catch((error) => {
-      console.error("Failed to open external URL", error);
-    });
+    void import("@tauri-apps/plugin-opener")
+      .then(({ openUrl }) => openUrl(url))
+      .catch((error) => {
+        console.error("Failed to open external URL", error);
+      });
   };
 
   document.addEventListener(
