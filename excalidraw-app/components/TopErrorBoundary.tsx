@@ -55,6 +55,7 @@ export class TopErrorBoundary extends React.Component<
             <div className="ErrorSplash-details">
               <label>Error details</label>
               <textarea
+                className="box-border mt-2 w-full"
                 rows={6}
                 readOnly
                 onPointerDown={this.selectTextArea}

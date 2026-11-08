@@ -42,8 +42,8 @@
   },
   "overrides": [
     {
-      "files": ["packages/excalidraw/**/*.{ts,tsx}"],
-      "excludedFiles": ["packages/excalidraw/**/*.test.{ts,tsx}", "packages/excalidraw/**/*.test.*.{ts,tsx}"],
+      "files": ["excalidraw-app/lib/excalidraw/**/*.{ts,tsx}"],
+      "excludedFiles": ["excalidraw-app/lib/excalidraw/**/*.test.{ts,tsx}", "excalidraw-app/lib/excalidraw/**/*.test.*.{ts,tsx}"],
       "rules": {
         "@typescript-eslint/no-restricted-imports": [
           "error",

@@ -1,5 +1,7 @@
 import { LoadIcon, PlusIcon } from "@excalidraw/excalidraw/components/icons";
 
+import { Button } from "../components/Button";
+
 export const HomeHeader = ({
   query,
   onQueryChange,
@@ -12,24 +14,24 @@ export const HomeHeader = ({
   onImport: () => void;
 }) => {
   return (
-    <header className="app-home__header">
-      <div className="app-home__title-row">
-        <h1>Excalidraw</h1>
-        <div className="app-home__actions">
-          <button type="button" className="app-home__button" onClick={onNew}>
+    <header className="mx-auto mb-4 flex max-w-[1200px] flex-col gap-3">
+      <div className="flex items-center justify-between gap-4 max-[600px]:flex-col max-[600px]:items-start">
+        <h1 className="m-0 text-2xl font-bold">Excalidraw</h1>
+        <div className="flex gap-2 max-[600px]:w-full">
+          <Button className="max-[600px]:flex-1" onClick={onNew}>
             {PlusIcon} New
-          </button>
-          <button
-            type="button"
-            className="app-home__button app-home__button--secondary"
+          </Button>
+          <Button
+            variant="secondary"
+            className="max-[600px]:flex-1"
             onClick={onImport}
           >
             {LoadIcon} Import
-          </button>
+          </Button>
         </div>
       </div>
       <input
-        className="app-home__search"
+        className="min-h-11 w-full rounded-[0.6rem] border border-app-border bg-app-surface px-3.5 font-app text-base text-app-text outline-none focus:border-app-accent"
         type="search"
         value={query}
         placeholder="Search drawings"

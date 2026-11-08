@@ -7,68 +7,68 @@ export default defineConfig({
     alias: [
       {
         find: /^@excalidraw\/common$/,
-        replacement: path.resolve(__dirname, "./packages/common/src/index.ts"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/common/src/index.ts"),
       },
       {
         find: /^@excalidraw\/common\/(.*?)/,
-        replacement: path.resolve(__dirname, "./packages/common/src/$1"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/common/src/$1"),
       },
       {
         find: /^@excalidraw\/element$/,
-        replacement: path.resolve(__dirname, "./packages/element/src/index.ts"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/element/src/index.ts"),
       },
       {
         find: /^@excalidraw\/element\/(.*?)/,
-        replacement: path.resolve(__dirname, "./packages/element/src/$1"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/element/src/$1"),
       },
       {
         find: /^@excalidraw\/excalidraw$/,
-        replacement: path.resolve(__dirname, "./packages/excalidraw/index.tsx"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/excalidraw/index.tsx"),
       },
       {
         find: /^@excalidraw\/excalidraw\/(.*?)/,
-        replacement: path.resolve(__dirname, "./packages/excalidraw/$1"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/excalidraw/$1"),
       },
       {
         find: /^@excalidraw\/math$/,
-        replacement: path.resolve(__dirname, "./packages/math/src/index.ts"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/math/src/index.ts"),
       },
       {
         find: /^@excalidraw\/math\/(.*?)/,
-        replacement: path.resolve(__dirname, "./packages/math/src/$1"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/math/src/$1"),
       },
       {
         find: /^@excalidraw\/utils$/,
-        replacement: path.resolve(__dirname, "./packages/utils/src/index.ts"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/utils/src/index.ts"),
       },
       {
         find: /^@excalidraw\/utils\/(.*?)/,
-        replacement: path.resolve(__dirname, "./packages/utils/src/$1"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/utils/src/$1"),
       },
       {
         find: /^@excalidraw\/fractional-indexing$/,
         replacement: path.resolve(
           __dirname,
-          "./packages/fractional-indexing/src/index.ts",
+          "./excalidraw-app/lib/fractional-indexing/src/index.ts",
         ),
       },
       {
         find: /^@excalidraw\/fractional-indexing\/(.*?)/,
         replacement: path.resolve(
           __dirname,
-          "./packages/fractional-indexing/src/$1",
+          "./excalidraw-app/lib/fractional-indexing/src/$1",
         ),
       },
       {
         find: /^@excalidraw\/laser-pointer$/,
         replacement: path.resolve(
           __dirname,
-          "./packages/laser-pointer/src/index.ts",
+          "./excalidraw-app/lib/laser-pointer/src/index.ts",
         ),
       },
       {
         find: /^@excalidraw\/laser-pointer\/(.*?)/,
-        replacement: path.resolve(__dirname, "./packages/laser-pointer/src/$1"),
+        replacement: path.resolve(__dirname, "./excalidraw-app/lib/laser-pointer/src/$1"),
       },
     ],
   },

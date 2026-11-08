@@ -5,8 +5,7 @@ package-lock.json
 firebase/
 dist/
 public/workbox
-packages/excalidraw/types
-examples/**/public
+excalidraw-app/lib/excalidraw/types
 dev-dist
 coverage
 src-tauri/target

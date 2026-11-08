@@ -1,7 +1,0 @@
-packages:
-  - excalidraw-app
-  - packages/*
-  - examples/*
-
-overrides:
-  strip-ansi: 6.0.1

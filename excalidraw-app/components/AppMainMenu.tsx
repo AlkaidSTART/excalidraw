@@ -31,7 +31,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Preferences />
       <MainMenu.DefaultItems.ToggleTheme allowSystemTheme theme={props.theme} />
       <MainMenu.ItemCustom>
-        <LanguageList style={{ width: "100%" }} />
+        <LanguageList className="w-full" />
       </MainMenu.ItemCustom>
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>

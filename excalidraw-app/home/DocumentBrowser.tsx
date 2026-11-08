@@ -8,10 +8,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
+import { Button } from "../components/Button";
+
 import { DocumentCard } from "./DocumentCard";
 import { HomeHeader } from "./HomeHeader";
-
-import "./home.scss";
 
 import type { DocumentMeta, DocumentStore } from "../storage/types";
 
@@ -216,7 +216,7 @@ export const DocumentBrowser = ({
   }, [dialog, refresh, store]);
 
   return (
-    <div className="app-home">
+    <div className="box-border min-h-dvh bg-app-bg pl-[calc(env(safe-area-inset-left,0px)_+_1rem)] pr-[calc(env(safe-area-inset-right,0px)_+_1rem)] pt-[calc(env(safe-area-inset-top,0px)_+_1rem)] pb-[calc(env(safe-area-inset-bottom,0px)_+_1rem)] text-app-text">
       <HomeHeader
         query={query}
         onQueryChange={setQuery}
@@ -225,31 +225,35 @@ export const DocumentBrowser = ({
       />
 
       {error && (
-        <div className="app-home__error">
+        <div className="mx-auto mb-4 flex max-w-[1200px] items-center justify-between gap-4 rounded-[0.6rem] border border-app-danger px-4 py-3 text-app-danger">
           {error}
-          <button type="button" onClick={() => setError(null)}>
+          <Button variant="secondary" onClick={() => setError(null)}>
             Dismiss
-          </button>
+          </Button>
         </div>
       )}
 
       {loading ? (
-        <p className="app-home__empty">Loading drawings…</p>
+        <p className="mx-auto my-12 max-w-[1200px] text-center text-app-text-muted">
+          Loading drawings…
+        </p>
       ) : filteredDocuments.length === 0 ? (
-        <div className="app-home__empty">
-          <h2>{documents.length ? "No drawings found" : "No drawings yet"}</h2>
-          <p>Create a new drawing or import an existing .excalidraw file.</p>
-          <div className="app-home__empty-actions">
-            <button type="button" onClick={() => void createDocument()}>
-              New drawing
-            </button>
-            <button type="button" onClick={() => void importDocument()}>
+        <div className="mx-auto my-12 max-w-[1200px] text-center text-app-text-muted">
+          <h2 className="mb-2 mt-0 font-bold text-app-text">
+            {documents.length ? "No drawings found" : "No drawings yet"}
+          </h2>
+          <p className="mb-4 mt-0">
+            Create a new drawing or import an existing .excalidraw file.
+          </p>
+          <div className="flex justify-center gap-2">
+            <Button onClick={() => void createDocument()}>New drawing</Button>
+            <Button variant="secondary" onClick={() => void importDocument()}>
               Import file
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <div className="app-home__grid">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4 max-[600px]:grid-cols-1">
           {filteredDocuments.map((document) => (
             <DocumentCard
               key={document.id}
@@ -268,12 +272,22 @@ export const DocumentBrowser = ({
       )}
 
       {dialog.type !== "none" && (
-        <div className="app-dialog-backdrop" role="presentation">
-          <div className="app-dialog" role="dialog" aria-modal="true">
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/[0.45] p-4"
+          role="presentation"
+        >
+          <div
+            className="box-border w-[min(420px,100%)] rounded-[0.9rem] bg-app-surface p-5 text-app-text shadow-[0_20px_60px_rgb(0_0_0_/_25%)]"
+            role="dialog"
+            aria-modal="true"
+          >
             {dialog.type === "rename" ? (
               <>
-                <h2>Rename drawing</h2>
+                <h2 className="mb-3 mt-0 text-[1.15rem] font-bold">
+                  Rename drawing
+                </h2>
                 <input
+                  className="box-border min-h-11 w-full rounded-[0.5rem] border border-app-border bg-app-bg px-3 font-app text-base text-app-text outline-none focus:border-app-accent"
                   autoFocus
                   value={dialog.name}
                   onChange={(event) =>
@@ -288,32 +302,32 @@ export const DocumentBrowser = ({
                     }
                   }}
                 />
-                <div className="app-dialog__actions">
-                  <button
-                    type="button"
+                <div className="mt-4 flex justify-end gap-2">
+                  <Button
+                    variant="secondary"
                     onClick={() => setDialog({ type: "none" })}
                   >
                     Cancel
-                  </button>
-                  <button type="button" onClick={() => void confirmRename()}>
-                    Save
-                  </button>
+                  </Button>
+                  <Button onClick={() => void confirmRename()}>Save</Button>
                 </div>
               </>
             ) : (
               <>
-                <h2>Delete “{dialog.document.name}”?</h2>
-                <p>This removes the drawing and its images from this device.</p>
-                <div className="app-dialog__actions">
-                  <button
-                    type="button"
+                <h2 className="mb-3 mt-0 text-[1.15rem] font-bold">
+                  Delete “{dialog.document.name}”?
+                </h2>
+                <p className="mb-4 mt-0 text-app-text-muted">
+                  This removes the drawing and its images from this device.
+                </p>
+                <div className="mt-4 flex justify-end gap-2">
+                  <Button
+                    variant="secondary"
                     onClick={() => setDialog({ type: "none" })}
                   >
                     Cancel
-                  </button>
-                  <button type="button" onClick={() => void confirmDelete()}>
-                    Delete
-                  </button>
+                  </Button>
+                  <Button onClick={() => void confirmDelete()}>Delete</Button>
                 </div>
               </>
             )}

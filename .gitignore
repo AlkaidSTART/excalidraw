@@ -21,7 +21,7 @@ npm-debug.log*
 package-lock.json
 yarn-debug.log*
 yarn-error.log*
-packages/excalidraw/types
+excalidraw-app/lib/excalidraw/types
 coverage
 dev-dist
 html
@@ -31,3 +31,4 @@ meta*.json
 # tauri
 src-tauri/target
 src-tauri/gen/schemas
+/.worktrees/

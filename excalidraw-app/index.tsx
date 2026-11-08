@@ -8,7 +8,7 @@ import { MemoryDocumentStore } from "./storage/MemoryDocumentStore";
 import { getDatabase } from "./storage/db";
 import { runLegacyMigration } from "./storage/legacyMigration";
 import { installTauriIntegrations, isRunningInTauri } from "./tauri";
-import "./index.scss";
+import "./index.css";
 
 import type { DocumentStore } from "./storage/types";
 
@@ -31,7 +31,11 @@ try {
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
 
-root.render(<div className="app-bootstrap">Loading…</div>);
+root.render(
+  <div className="flex h-dvh items-center justify-center bg-[#121212] p-4 text-center font-app text-base text-white">
+    Loading…
+  </div>,
+);
 
 const bootstrap = async () => {
   installTauriIntegrations();
@@ -50,7 +54,7 @@ const bootstrap = async () => {
     } catch (databaseError) {
       console.error("Failed to open the document database", databaseError);
       root.render(
-        <div className="app-bootstrap app-bootstrap--error">
+        <div className="flex h-dvh items-center justify-center bg-[#121212] p-4 text-center font-app text-base text-[#ff8787]">
           Failed to open the local database. Restart the app and try again.
         </div>,
       );

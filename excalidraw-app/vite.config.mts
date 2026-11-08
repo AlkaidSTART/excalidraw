@@ -5,9 +5,10 @@ import svgrPlugin from "vite-plugin-svgr";
 import checker from "vite-plugin-checker";
 
 export default defineConfig(({ mode }) => {
-  const envVars = loadEnv(mode, `../`);
+  const envVars = loadEnv(mode, path.resolve(__dirname, ".."));
 
   return {
+    root: __dirname,
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
       open: false,
@@ -17,68 +18,56 @@ export default defineConfig(({ mode }) => {
       alias: [
         {
           find: /^@excalidraw\/common$/,
-          replacement: path.resolve(
-            __dirname,
-            "../packages/common/src/index.ts",
-          ),
+          replacement: path.resolve(__dirname, "./lib/common/src/index.ts"),
         },
         {
           find: /^@excalidraw\/common\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/common/src/$1"),
+          replacement: path.resolve(__dirname, "./lib/common/src/$1"),
         },
         {
           find: /^@excalidraw\/element$/,
-          replacement: path.resolve(
-            __dirname,
-            "../packages/element/src/index.ts",
-          ),
+          replacement: path.resolve(__dirname, "./lib/element/src/index.ts"),
         },
         {
           find: /^@excalidraw\/element\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/element/src/$1"),
+          replacement: path.resolve(__dirname, "./lib/element/src/$1"),
         },
         {
           find: /^@excalidraw\/excalidraw$/,
-          replacement: path.resolve(
-            __dirname,
-            "../packages/excalidraw/index.tsx",
-          ),
+          replacement: path.resolve(__dirname, "./lib/excalidraw/index.tsx"),
         },
         {
           find: /^@excalidraw\/excalidraw\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/excalidraw/$1"),
+          replacement: path.resolve(__dirname, "./lib/excalidraw/$1"),
         },
         {
           find: /^@excalidraw\/math$/,
-          replacement: path.resolve(__dirname, "../packages/math/src/index.ts"),
+          replacement: path.resolve(__dirname, "./lib/math/src/index.ts"),
         },
         {
           find: /^@excalidraw\/math\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/math/src/$1"),
+          replacement: path.resolve(__dirname, "./lib/math/src/$1"),
         },
         {
           find: /^@excalidraw\/utils$/,
-          replacement: path.resolve(
-            __dirname,
-            "../packages/utils/src/index.ts",
-          ),
+          replacement: path.resolve(__dirname, "./lib/utils/src/index.ts"),
         },
         {
           find: /^@excalidraw\/utils\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/utils/src/$1"),
+          replacement: path.resolve(__dirname, "./lib/utils/src/$1"),
         },
         {
           find: /^@excalidraw\/fractional-indexing$/,
           replacement: path.resolve(
             __dirname,
-            "../packages/fractional-indexing/src/index.ts",
+            "./lib/fractional-indexing/src/index.ts",
           ),
         },
         {
           find: /^@excalidraw\/laser-pointer$/,
           replacement: path.resolve(
             __dirname,
-            "../packages/laser-pointer/src/index.ts",
+            "./lib/laser-pointer/src/index.ts",
           ),
         },
       ],
@@ -104,7 +93,7 @@ export default defineConfig(({ mode }) => {
             }
 
             if (
-              id.includes("packages/excalidraw/locales") &&
+              id.includes("excalidraw-app/lib/excalidraw/locales") &&
               id.match(/en.json|percentages.json/) === null
             ) {
               const index = id.indexOf("locales/");
@@ -128,7 +117,10 @@ export default defineConfig(({ mode }) => {
         eslint:
           envVars.VITE_APP_ENABLE_ESLINT === "false"
             ? undefined
-            : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
+            : {
+                lintCommand:
+                  'eslint --ignore-path ../.eslintignore "./**/*.{js,ts,tsx}"',
+              },
         overlay: {
           initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
           badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",

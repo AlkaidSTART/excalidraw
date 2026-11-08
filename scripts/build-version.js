@@ -2,7 +2,10 @@
 
 const fs = require("fs");
 const path = require("path");
-const versionFile = path.join("build", "version.json");
+const outputDirectory = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(__dirname, "..", "excalidraw-app", "build");
+const versionFile = path.join(outputDirectory, "version.json");
 
 const versionDate = (date) => date.toISOString().replace(".000", "");
 
@@ -43,4 +46,5 @@ const data = JSON.stringify(
   2,
 );
 
+fs.mkdirSync(outputDirectory, { recursive: true });
 fs.writeFileSync(versionFile, data);

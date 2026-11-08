@@ -4,6 +4,8 @@ import {
   TrashIcon,
 } from "@excalidraw/excalidraw/components/icons";
 
+import { Button } from "../components/Button";
+
 import type { DocumentMeta } from "../storage/types";
 
 const formatDate = (timestamp: number) =>
@@ -31,44 +33,50 @@ export const DocumentCard = ({
   onExport: () => void;
 }) => {
   return (
-    <article className="app-document-card">
+    <article className="flex flex-col overflow-hidden rounded-[0.8rem] border border-app-border bg-app-surface">
       <button
         type="button"
-        className="app-document-card__preview"
+        className="relative flex aspect-[16/10] cursor-pointer items-center justify-center border-b border-app-border bg-app-surface-muted p-0 text-app-text-muted"
         onClick={onOpen}
         aria-label={`Open ${document.name}`}
       >
         {thumbnailUrl ? (
-          <img src={thumbnailUrl} alt="" />
+          <img
+            className="h-full w-full object-cover"
+            src={thumbnailUrl}
+            alt=""
+          />
         ) : (
-          <span className="app-document-card__placeholder">Excalidraw</span>
+          <span className="text-base font-semibold tracking-[0.02em] opacity-60">
+            Excalidraw
+          </span>
         )}
       </button>
-      <div className="app-document-card__body">
+      <div className="flex min-w-0 flex-col gap-[0.2rem] px-3.5 pb-1.5 pt-3">
         <button
           type="button"
-          className="app-document-card__name"
+          className="cursor-pointer truncate border-0 bg-transparent p-0 text-left text-base font-semibold text-app-text"
           onClick={onOpen}
         >
           {document.name}
         </button>
-        <span className="app-document-card__meta">
+        <span className="text-[0.8rem] text-app-text-muted">
           {formatDate(document.updatedAt)}
         </span>
       </div>
-      <div className="app-document-card__actions">
-        <button type="button" onClick={onRename} title="Rename">
+      <div className="flex gap-1 px-2.5 pb-3 pt-1.5">
+        <Button variant="ghost" onClick={onRename} title="Rename">
           Rename
-        </button>
-        <button type="button" onClick={onDuplicate} title="Duplicate">
+        </Button>
+        <Button variant="ghost" onClick={onDuplicate} title="Duplicate">
           {DuplicateIcon}
-        </button>
-        <button type="button" onClick={onExport} title="Export">
+        </Button>
+        <Button variant="ghost" onClick={onExport} title="Export">
           {exportToFileIcon}
-        </button>
-        <button type="button" onClick={onDelete} title="Delete">
+        </Button>
+        <Button variant="ghost-danger" onClick={onDelete} title="Delete">
           {TrashIcon}
-        </button>
+        </Button>
       </div>
     </article>
   );

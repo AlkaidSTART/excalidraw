@@ -95,11 +95,15 @@ const ExcalidrawWrapper = ({
   );
 
   if (loading) {
-    return <div className="app-bootstrap">Opening drawing…</div>;
+    return (
+      <div className="flex h-dvh items-center justify-center bg-[#121212] p-4 text-center font-app text-base text-white">
+        Opening drawing…
+      </div>
+    );
   }
 
   return (
-    <div style={{ height: "100%" }} className="excalidraw-app">
+    <div className="h-full">
       <Excalidraw
         initialData={initialData}
         onChange={onChange}
